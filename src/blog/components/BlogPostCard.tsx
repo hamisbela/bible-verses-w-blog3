@@ -12,6 +12,11 @@ interface BlogPostCardProps {
 }
 
 const BlogPostCard: React.FC<BlogPostCardProps> = ({ post, featured = false }) => {
+  // Function to render text with markdown bold formatting
+  const renderWithBoldFormatting = (text: string) => {
+    return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  };
+
   return (
     <Card className={`overflow-hidden hover:shadow-lg transition-all duration-300 h-full flex flex-col ${featured ? 'border-2 border-purple-200' : 'border'}`}>
       <Link to={`/blog/${post.slug}/`}>
@@ -45,9 +50,10 @@ const BlogPostCard: React.FC<BlogPostCardProps> = ({ post, featured = false }) =
           </div>
         </div>
         
-        <p className="text-neutral-600 mb-4 flex-1 line-clamp-3">
-          {post.excerpt}
-        </p>
+        <p 
+          className="text-neutral-600 mb-4 flex-1 line-clamp-3"
+          dangerouslySetInnerHTML={{ __html: renderWithBoldFormatting(post.excerpt) }}
+        ></p>
         
         <Link to={`/blog/${post.slug}/`} className="mt-auto">
           <Button 

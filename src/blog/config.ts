@@ -34,7 +34,7 @@ export const blogConfig = {
   },
   
   // Posts per page on blog index
-  postsPerPage: 6,
+  postsPerPage: 18,
   
   // Number of related posts to show
   relatedPostsCount: 3,

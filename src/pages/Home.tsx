@@ -1,12 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { Copy, Coffee, Check, Sparkles, BookOpen, BoxSelect as Select } from 'lucide-react';
+import { Copy, Coffee, Check, Sparkles, BookOpen, BoxSelect as Select, ArrowRight } from 'lucide-react';
 import { genAI } from '@/lib/gemini';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Helmet } from 'react-helmet';
+import { BlogPost } from '../blog/types';
+import { loadBlogPosts } from '../blog/utils/loadBlogPosts';
+import BlogPostCard from '../blog/components/BlogPostCard';
 import {
   Select as SelectUI,
   SelectContent,
@@ -70,6 +74,23 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [loadingPosts, setLoadingPosts] = useState(true);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const posts = await loadBlogPosts();
+        setBlogPosts(posts.slice(0, 3)); // Get the first 3 posts
+      } catch (error) {
+        console.error('Error loading blog posts:', error);
+      } finally {
+        setLoadingPosts(false);
+      }
+    };
+    
+    fetchPosts();
+  }, []);
 
   const generateVerse = async () => {
     if (!translation) return;
@@ -362,6 +383,29 @@ export default function Home() {
                 </div>
               </div>
             </article>
+          </div>
+
+          {/* Blog Posts Section */}
+          <div className="mb-16">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold">From Our Blog</h2>
+              <Link to="/blog/" className="text-purple-600 hover:text-purple-700 flex items-center">
+                View All Posts
+                <ArrowRight className="ml-1 h-4 w-4" />
+              </Link>
+            </div>
+            
+            {loadingPosts ? (
+              <div className="flex justify-center items-center h-40">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {blogPosts.map(post => (
+                  <BlogPostCard key={post.id} post={post} />
+                ))}
+              </div>
+            )}
           </div>
 
           <SupportBox />
