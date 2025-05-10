@@ -1,0 +1,8 @@
+[build]
+  command = "npm run build && node dist-scripts/extract-posts.js"
+  publish = "dist"
+
+[[redirects]]
+  from = "/blog/*"
+  to = "/index.html"
+  status = 200
