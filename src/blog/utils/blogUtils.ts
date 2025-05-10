@@ -45,6 +45,34 @@ export const extractExcerpt = (content: string, maxLength = 160): string => {
   return excerpt.substring(0, lastSpace) + '...';
 };
 
+// Extract plain text from markdown for meta tags
+export const extractPlainTextExcerpt = (markdown: string, maxLength = 160): string => {
+  // Simple markdown to text conversion for meta tags
+  let text = markdown
+    .replace(/#{1,6}\s+/g, '') // Remove headers
+    .replace(/\*\*|\*|__|\|_/g, '') // Remove bold, italic
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Replace links with just their text
+    .replace(/!\[([^\]]+)\]\([^)]+\)/g, '$1') // Replace images with alt text
+    .replace(/`{1,3}[^`]+`{1,3}/g, '') // Remove code blocks
+    .replace(/\n+/g, ' ') // Replace newlines with spaces
+    .trim();
+  
+  // Find the first sentence
+  const firstSentenceEnd = text.match(/[.!?](\s|$)/);
+  if (firstSentenceEnd && firstSentenceEnd.index !== undefined && firstSentenceEnd.index < maxLength) {
+    return text.substring(0, firstSentenceEnd.index + 1);
+  }
+  
+  // If no sentence end found or it's too long
+  if (text.length <= maxLength) return text;
+  
+  // Cut at word boundary
+  const excerpt = text.substring(0, maxLength);
+  const lastSpace = excerpt.lastIndexOf(' ');
+  
+  return excerpt.substring(0, lastSpace) + '...';
+};
+
 // Get related posts based on current post
 export const getRelatedPosts = (currentPost: BlogPost, allPosts: BlogPost[], count = 3): BlogPost[] => {
   // Filter out the current post

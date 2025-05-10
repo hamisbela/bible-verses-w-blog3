@@ -13,9 +13,9 @@ export default function Footer() {
             <h3 className="font-semibold mb-3">Quick Links</h3>
             <div className="space-y-2">
               <Link to="/" className="block hover:text-neutral-300">Home</Link>
-              <Link to="/blog" className="block hover:text-neutral-300">Blog</Link>
-              <Link to="/about" className="block hover:text-neutral-300">About</Link>
-              <Link to="/contact" className="block hover:text-neutral-300">Contact</Link>
+              <Link to="/blog/" className="block hover:text-neutral-300">Blog</Link>
+              <Link to="/about/" className="block hover:text-neutral-300">About</Link>
+              <Link to="/contact/" className="block hover:text-neutral-300">Contact</Link>
             </div>
           </div>
           <div>
@@ -50,7 +50,7 @@ export default function Footer() {
             <p className="text-sm text-neutral-300">
               Explore our blog for biblical insights, devotionals, and spiritual guidance for your daily walk.
             </p>
-            <Link to="/blog" className="block mt-2 text-sm text-purple-300 hover:text-purple-200">
+            <Link to="/blog/" className="block mt-2 text-sm text-purple-300 hover:text-purple-200">
               Read Our Latest Articles →
             </Link>
           </div>

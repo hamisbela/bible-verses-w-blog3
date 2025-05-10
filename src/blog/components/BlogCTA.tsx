@@ -14,7 +14,7 @@ const BlogCTA: React.FC = () => {
           <h2 className="text-2xl font-bold">{cta.title}</h2>
           <p className="text-neutral-600">{cta.description}</p>
         </div>
-        <Link to={cta.buttonUrl}>
+        <Link to={`${cta.buttonUrl}/`}>
           <Button size="lg" className="bg-purple-500 hover:bg-purple-600 text-white whitespace-nowrap">
             {cta.buttonText}
             <ArrowRight className="ml-2 h-5 w-5" />

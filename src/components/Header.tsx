@@ -13,9 +13,9 @@ export default function Header() {
           </Link>
           <div className="flex items-center space-x-4 sm:space-x-6">
             <Link to="/" className="hover:text-neutral-600">Home</Link>
-            <Link to="/blog" className="hover:text-neutral-600">Blog</Link>
-            <Link to="/about" className="hover:text-neutral-600">About</Link>
-            <Link to="/contact" className="hover:text-neutral-600">Contact</Link>
+            <Link to="/blog/" className="hover:text-neutral-600">Blog</Link>
+            <Link to="/about/" className="hover:text-neutral-600">About</Link>
+            <Link to="/contact/" className="hover:text-neutral-600">Contact</Link>
             <a
               href="https://roihacks.gumroad.com/l/dselxe?utm_campaign=donation-home-page&utm_medium=website&utm_source=random-verse-generator"
               target="_blank"

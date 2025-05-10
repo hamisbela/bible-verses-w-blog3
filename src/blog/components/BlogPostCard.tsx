@@ -14,7 +14,7 @@ interface BlogPostCardProps {
 const BlogPostCard: React.FC<BlogPostCardProps> = ({ post, featured = false }) => {
   return (
     <Card className={`overflow-hidden hover:shadow-lg transition-all duration-300 h-full flex flex-col ${featured ? 'border-2 border-purple-200' : 'border'}`}>
-      <Link to={`/blog/${post.slug}`}>
+      <Link to={`/blog/${post.slug}/`}>
         <div className="relative aspect-video w-full overflow-hidden">
           <div 
             className="absolute inset-0 bg-cover bg-center transform hover:scale-105 transition-transform duration-500"
@@ -49,7 +49,7 @@ const BlogPostCard: React.FC<BlogPostCardProps> = ({ post, featured = false }) =
           {post.excerpt}
         </p>
         
-        <Link to={`/blog/${post.slug}`} className="mt-auto">
+        <Link to={`/blog/${post.slug}/`} className="mt-auto">
           <Button 
             variant="ghost" 
             size="sm" 

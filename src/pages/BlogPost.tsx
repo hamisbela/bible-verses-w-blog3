@@ -7,9 +7,10 @@ import BlogContent from '../blog/components/BlogContent';
 import BlogFooter from '../blog/components/BlogFooter';
 import BlogSidebar from '../blog/components/BlogSidebar';
 import { loadBlogPosts } from '../blog/utils/loadBlogPosts';
-import { getRelatedPosts } from '../blog/utils/blogUtils';
+import { getRelatedPosts, extractPlainTextExcerpt } from '../blog/utils/blogUtils';
 import { BlogPost } from '../blog/types';
 import { blogConfig } from '../blog/config';
+import { Helmet } from 'react-helmet';
 
 export default function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -20,6 +21,7 @@ export default function BlogPostPage() {
   const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
+  const [metaDescription, setMetaDescription] = useState('');
   
   useEffect(() => {
     const fetchPosts = async () => {
@@ -32,6 +34,10 @@ export default function BlogPostPage() {
         setPost(foundPost || null);
         
         if (foundPost) {
+          // Generate meta description from first paragraph/sentence of content
+          const description = extractPlainTextExcerpt(foundPost.content, 160);
+          setMetaDescription(description);
+          
           const related = getRelatedPosts(
             foundPost, 
             loadedPosts, 
@@ -52,7 +58,7 @@ export default function BlogPostPage() {
   const handleSearch = (term: string) => {
     setSearchTerm(term);
     if (term) {
-      navigate(`/blog?search=${encodeURIComponent(term)}`);
+      navigate(`/blog/?search=${encodeURIComponent(term)}`);
     }
   };
   
@@ -74,7 +80,7 @@ export default function BlogPostPage() {
           <p className="text-neutral-600 mb-8">
             The blog post you're looking for doesn't exist or has been removed.
           </p>
-          <Link to="/blog">
+          <Link to="/blog/">
             <Button 
               variant="outline" 
               className="px-6 py-2 border-2 border-purple-500 text-purple-600 hover:bg-purple-50"
@@ -89,25 +95,33 @@ export default function BlogPostPage() {
   }
   
   return (
-    <div className="container mx-auto px-4 py-12">
-      <div className="flex flex-col lg:flex-row gap-12">
-        <div className="flex-1">
-          <Link to="/blog" className="inline-flex items-center text-purple-600 hover:text-purple-700 mb-8">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            <span>Back to Blog</span>
-          </Link>
+    <>
+      <Helmet>
+        <title>{post.title} - Random Bible Verse Generator</title>
+        <meta name="description" content={metaDescription} />
+        <link rel="canonical" href={`https://randomversegenerator.com/blog/${post.slug}/`} />
+      </Helmet>
+      
+      <div className="container mx-auto px-4 py-12">
+        <div className="flex flex-col lg:flex-row gap-12">
+          <div className="flex-1">
+            <Link to="/blog/" className="inline-flex items-center text-purple-600 hover:text-purple-700 mb-8">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              <span>Back to Blog</span>
+            </Link>
+            
+            <BlogHeader post={post} />
+            <BlogContent post={post} />
+            <BlogFooter post={post} relatedPosts={relatedPosts} />
+          </div>
           
-          <BlogHeader post={post} />
-          <BlogContent post={post} />
-          <BlogFooter post={post} relatedPosts={relatedPosts} />
-        </div>
-        
-        <div className="w-full lg:w-80 shrink-0">
-          <div className="sticky top-8">
-            <BlogSidebar onSearch={handleSearch} searchTerm={searchTerm} />
+          <div className="w-full lg:w-80 shrink-0">
+            <div className="sticky top-8">
+              <BlogSidebar onSearch={handleSearch} searchTerm={searchTerm} />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -41,27 +41,13 @@ const BlogSidebar: React.FC<BlogSidebarProps> = ({ onSearch, searchTerm }) => {
           </div>
           <h3 className="text-xl font-semibold">{blogConfig.cta.title}</h3>
           <p className="text-neutral-600">{blogConfig.cta.description}</p>
-          <Link to={blogConfig.cta.buttonUrl}>
+          <Link to={`${blogConfig.cta.buttonUrl}/`}>
             <Button className="bg-purple-500 hover:bg-purple-600 text-white">
               {blogConfig.cta.buttonText}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>
         </div>
-      </Card>
-      
-      {/* About Widget */}
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">About Our Blog</h3>
-        <p className="text-neutral-600 mb-4">
-          Discover insights, devotionals, and spiritual guidance through our blog posts. 
-          We offer biblical wisdom for your daily life and spiritual journey.
-        </p>
-        <Link to="/about">
-          <Button variant="outline" size="sm" className="w-full">
-            Learn More
-          </Button>
-        </Link>
       </Card>
     </div>
   );

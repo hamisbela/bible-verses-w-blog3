@@ -78,6 +78,34 @@ function extractExcerpt(content, maxLength = 160) {
   return excerpt.substring(0, lastSpace) + '...';
 }
 
+// Extract plain text from markdown for meta tags
+function extractPlainTextExcerpt(markdown, maxLength = 160) {
+  // Simple markdown to text conversion for meta tags
+  let text = markdown
+    .replace(/#{1,6}\\s+/g, '') // Remove headers
+    .replace(/\\*\\*|\\*|__|\\|_/g, '') // Remove bold, italic
+    .replace(/\\[([^\\]]+)\\]\\([^)]+\\)/g, '$1') // Replace links with just their text
+    .replace(/!\\[([^\\]]+)\\]\\([^)]+\\)/g, '$1') // Replace images with alt text
+    .replace(/\`{1,3}[^\`]+\`{1,3}/g, '') // Remove code blocks
+    .replace(/\\n+/g, ' ') // Replace newlines with spaces
+    .trim();
+  
+  // Find the first sentence
+  const firstSentenceEnd = text.match(/[.!?](\\s|$)/);
+  if (firstSentenceEnd && firstSentenceEnd.index !== undefined && firstSentenceEnd.index < maxLength) {
+    return text.substring(0, firstSentenceEnd.index + 1);
+  }
+  
+  // If no sentence end found or it's too long
+  if (text.length <= maxLength) return text;
+  
+  // Cut at word boundary
+  const excerpt = text.substring(0, maxLength);
+  const lastSpace = excerpt.lastIndexOf(' ');
+  
+  return excerpt.substring(0, lastSpace) + '...';
+}
+
 function parseMarkdownToPost(content, filename) {
   // Extract title from the first line (assuming it's a markdown h1)
   const titleMatch = content.match(/^# (.+)$/m);
@@ -91,6 +119,7 @@ function parseMarkdownToPost(content, filename) {
   const slug = slugify(title);
   const imageUrl = getRandomFeatureImage();
   const excerpt = extractExcerpt(contentWithoutTitle);
+  const metaDescription = extractPlainTextExcerpt(contentWithoutTitle);
   const readTime = estimateReadTime(contentWithoutTitle);
   
   return {
@@ -99,16 +128,84 @@ function parseMarkdownToPost(content, filename) {
     title,
     content: contentWithoutTitle,
     excerpt,
+    metaDescription,
     date: new Date().toISOString(),
     imageUrl,
     readTime
   };
 }
 
+// Generate XML sitemap
+function generateXmlSitemap(posts, baseUrl = 'https://randomversegenerator.com') {
+  let xml = '<?xml version="1.0" encoding="UTF-8"?>';
+  xml += '\\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+  
+  // Add main pages
+  const mainPages = ['', 'about/', 'blog/', 'contact/'];
+  for (const page of mainPages) {
+    xml += \`
+  <url>
+    <loc>\${baseUrl}/\${page}</loc>
+    <lastmod>\${new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>\${page === '' ? '1.0' : '0.8'}</priority>
+  </url>\`;
+  }
+  
+  // Add blog pagination pages
+  const postsPerPage = 6;
+  const totalPages = Math.ceil(posts.length / postsPerPage);
+  
+  for (let i = 1; i <= totalPages; i++) {
+    if (i > 1) { // Page 1 is already covered by /blog/
+      xml += \`
+  <url>
+    <loc>\${baseUrl}/blog/page/\${i}/</loc>
+    <lastmod>\${new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>\`;
+    }
+  }
+  
+  // Add blog posts
+  for (const post of posts) {
+    xml += \`
+  <url>
+    <loc>\${baseUrl}/blog/\${post.slug}/</loc>
+    <lastmod>\${post.date.split('T')[0]}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>\`;
+  }
+  
+  xml += '\\n</urlset>';
+  
+  return xml;
+}
+
+// Generate sitemap index if needed (for large sites)
+function generateSitemapIndex(sitemapCount, baseUrl = 'https://randomversegenerator.com') {
+  const today = new Date().toISOString().split('T')[0];
+  let xml = '<?xml version="1.0" encoding="UTF-8"?>';
+  xml += '\\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+  
+  for (let i = 1; i <= sitemapCount; i++) {
+    xml += \`
+  <sitemap>
+    <loc>\${baseUrl}/sitemap\${i}.xml</loc>
+    <lastmod>\${today}</lastmod>
+  </sitemap>\`;
+  }
+  
+  xml += '\\n</sitemapindex>';
+  
+  return xml;
+}
+
 async function extractBlogPosts() {
   console.log('Starting blog post extraction...');
   
-  // Using __dirname and path.resolve for ES modules compatibility
   const publicDir = path.resolve(process.cwd(), 'dist');
   const zipPath = path.join(publicDir, 'blog-posts.zip');
   
@@ -145,6 +242,47 @@ async function extractBlogPosts() {
     // Write processed posts to JSON file
     const outputPath = path.join(publicDir, 'blog-data.json');
     fs.writeFileSync(outputPath, JSON.stringify(posts, null, 2));
+    
+    // Generate XML sitemap
+    const MAX_URLS_PER_SITEMAP = 500; // Most search engines recommend fewer than 50,000
+    const baseUrl = 'https://randomversegenerator.com';
+    
+    if (posts.length + 10 <= MAX_URLS_PER_SITEMAP) { // 10 accounts for main pages and pagination
+      // Generate a single sitemap
+      const sitemap = generateXmlSitemap(posts, baseUrl);
+      fs.writeFileSync(path.join(publicDir, 'sitemap.xml'), sitemap);
+      console.log('Generated sitemap.xml');
+    } else {
+      // Generate multiple sitemaps and an index
+      const postsPerSitemap = Math.ceil(posts.length / Math.ceil(posts.length / MAX_URLS_PER_SITEMAP));
+      const sitemapCount = Math.ceil(posts.length / postsPerSitemap);
+      
+      // Create main sitemap (non-blog content)
+      const mainSitemap = generateXmlSitemap([], baseUrl);
+      fs.writeFileSync(path.join(publicDir, 'sitemap1.xml'), mainSitemap);
+      
+      // Create post sitemaps
+      for (let i = 0; i < sitemapCount; i++) {
+        const startIdx = i * postsPerSitemap;
+        const endIdx = Math.min((i + 1) * postsPerSitemap, posts.length);
+        const sitemapPosts = posts.slice(startIdx, endIdx);
+        
+        const sitemap = generateXmlSitemap(sitemapPosts, baseUrl);
+        fs.writeFileSync(path.join(publicDir, \`sitemap\${i + 2}.xml\`), sitemap);
+      }
+      
+      // Create sitemap index
+      const sitemapIndex = generateSitemapIndex(sitemapCount + 1, baseUrl);
+      fs.writeFileSync(path.join(publicDir, 'sitemap.xml'), sitemapIndex);
+      
+      console.log(\`Generated sitemap index with \${sitemapCount + 1} sitemaps\`);
+    }
+    
+    // Generate HTML sitemap
+    fs.copyFileSync(
+      path.join(publicDir, 'index.html'),
+      path.join(publicDir, 'sitemap.html')
+    );
     
     console.log(\`Successfully extracted \${posts.length} blog posts to blog-data.json\`);
   } catch (error) {

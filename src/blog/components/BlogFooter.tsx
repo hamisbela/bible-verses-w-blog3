@@ -30,7 +30,7 @@ const BlogFooter: React.FC<BlogFooterProps> = ({ post, relatedPosts }) => {
           <div className="flex-1 space-y-4">
             <h3 className="text-2xl font-bold">{blogConfig.cta.title}</h3>
             <p className="text-neutral-600">{blogConfig.cta.description}</p>
-            <Link to={blogConfig.cta.buttonUrl}>
+            <Link to={`${blogConfig.cta.buttonUrl}/`}>
               <Button size="lg" className="bg-purple-500 hover:bg-purple-600 text-white">
                 {blogConfig.cta.buttonText}
                 <ArrowRight className="ml-2 h-4 w-4" />
