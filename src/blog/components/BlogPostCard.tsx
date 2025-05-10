@@ -31,7 +31,7 @@ const BlogPostCard: React.FC<BlogPostCardProps> = ({ post, featured = false }) =
                 Featured
               </div>
             )}
-            <h3 className="absolute bottom-4 left-4 right-4 text-white text-lg md:text-xl font-bold line-clamp-2">
+            <h3 className="absolute bottom-4 left-4 right-4 text-white text-sm sm:text-lg md:text-xl font-bold line-clamp-2">
               {post.title}
             </h3>
           </div>

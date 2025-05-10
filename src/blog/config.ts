@@ -14,6 +14,17 @@ export const blogConfig = {
     'https://images.pexels.com/photos/208371/pexels-photo-208371.jpeg', // Cross
     'https://images.pexels.com/photos/372326/pexels-photo-372326.jpeg', // Bible study
     'https://images.pexels.com/photos/415571/pexels-photo-415571.jpeg', // Prayer
+    'https://images.pexels.com/photos/3825011/pexels-photo-3825011.jpeg', // Open Bible with glasses
+    'https://images.pexels.com/photos/3224232/pexels-photo-3224232.jpeg', // Church interior
+    'https://images.pexels.com/photos/933486/pexels-photo-933486.jpeg', // Person reading Bible
+    'https://images.pexels.com/photos/1701535/pexels-photo-1701535.jpeg', // Church building
+    'https://images.pexels.com/photos/161060/read-book-open-literature-161060.jpeg', // Open book
+    'https://images.pexels.com/photos/236326/pexels-photo-236326.jpeg', // Sunset cross silhouette
+    'https://images.pexels.com/photos/2397645/pexels-photo-2397645.jpeg', // Ancient Bible
+    'https://images.pexels.com/photos/3768894/pexels-photo-3768894.jpeg', // Church window
+    'https://images.pexels.com/photos/3141079/pexels-photo-3141079.jpeg', // Person praying
+    'https://images.pexels.com/photos/2258536/pexels-photo-2258536.jpeg', // Stained glass window
+    'https://images.pexels.com/photos/33363/prayer-church-light-candle.jpg', // Prayer candles
   ],
   
   // Social sharing options

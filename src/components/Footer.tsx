@@ -16,6 +16,7 @@ export default function Footer() {
               <Link to="/blog/" className="block hover:text-neutral-300">Blog</Link>
               <Link to="/about/" className="block hover:text-neutral-300">About</Link>
               <Link to="/contact/" className="block hover:text-neutral-300">Contact</Link>
+              <Link to="/sitemap.html" className="block hover:text-neutral-300">Sitemap</Link>
             </div>
           </div>
           <div>
